@@ -18,6 +18,10 @@ lvim.keys.visual_mode["B"] = "^"
 
 lvim.keys.normal_mode["<S-l>"] = ":BufferLineCycleNext<CR>"
 lvim.keys.normal_mode["<S-h>"] = ":BufferLineCyclePrev<CR>"
+lvim.builtin.which_key.mappings["C"] = {
+    name = "Python",
+    c = {"<cmd>lua require('swenv.api').pick_venv()<cr>", "Choose Env"}
+}
 lvim.builtin.which_key.mappings["f"] = {
     "<cmd>Telescope find_files<CR>", "Files"
 }
@@ -220,6 +224,12 @@ local git_blame_config = function()
     vim.g.gitblame_enabled = 0
 end
 
+local swenv_config = function()
+    require('swenv').setup({
+        post_set_venv = function() vim.cmd("LspRestart") end
+    })
+end
+
 lvim.plugins = {
     {
         "zbirenbaum/copilot.lua",
@@ -241,5 +251,6 @@ lvim.plugins = {
         build = "cd app && npm install",
         init = function() vim.g.mkdp_filetypes = {"markdown"} end,
         ft = {"markdown"}
-    }, {'andweeb/presence.nvim'}
+    }, {'andweeb/presence.nvim'}, {'AckslD/swenv.nvim', config = swenv_config},
+    {'stevearc/dressing.nvim', opts = {}}
 }
