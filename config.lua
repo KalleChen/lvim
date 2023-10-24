@@ -22,9 +22,6 @@ lvim.builtin.which_key.mappings["C"] = {
     name = "Python",
     c = {"<cmd>lua require('swenv.api').pick_venv()<cr>", "Choose Env"}
 }
-lvim.builtin.which_key.mappings["f"] = {
-    "<cmd>Telescope find_files<CR>", "Files"
-}
 lvim.builtin.which_key.mappings["r"] = {
     name = "Replace",
     r = {"<cmd>lua require('spectre').open()<cr>", "Replace"},
@@ -288,6 +285,29 @@ local ufo_config = function()
     })
 end
 
+local aerial_config = function()
+    require("aerial").setup({
+        backends = {"lsp", "treesitter"},
+        layout = {default_direction = "right"},
+        close_automatic_events = {'unfocus'},
+        filter_kind = {
+            "Class", "Constructor", "Enum", "Function", "Interface", "Module",
+            "Method", "Struct", "Variable", "Constant", "NameSpace", "Package",
+            "Field", "Event", "Operator", "TypeParameter", "Key"
+        },
+        manage_folds = true,
+        link_folds_to_tree = false,
+        link_tree_to_folds = true,
+        open_automatic = true,
+        lsp = {
+            diagnostics_trigger_update = true,
+            update_when_errors = true,
+            update_delay = 300
+        },
+        treesitter = {update_delay = 300}
+    })
+end
+
 lvim.plugins = {
     {
         "zbirenbaum/copilot.lua",
@@ -317,5 +337,13 @@ lvim.plugins = {
             {"luukvbaal/statuscol.nvim", config = statuscol_config}
         },
         config = ufo_config
+    }, {
+        'stevearc/aerial.nvim',
+        opts = {},
+        -- Optional dependencies
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons"
+        },
+        config = aerial_config
     }
 }
