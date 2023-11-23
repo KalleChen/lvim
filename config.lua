@@ -1,3 +1,14 @@
+local function load_project_config()
+    local current_dir = vim.fn.getcwd()
+    local project_config_path = current_dir .. "/.nvim.lua"
+
+    -- Check if the file exists
+    if vim.fn.filereadable(project_config_path) ~= 0 then
+        -- Load the project specific config
+        dofile(project_config_path)
+    end
+end
+
 lvim.colorscheme = "tokyonight-storm"
 vim.opt.relativenumber = true
 lvim.transparent_window = true
@@ -50,8 +61,13 @@ lvim.builtin.treesitter.ensure_installed = {
 lvim.builtin.treesitter.ignore_install = {"haskell"}
 lvim.builtin.treesitter.highlight.enable = true
 
+lvim.builtin.which_key.mappings["l"]["f"] = {
+    function() require("lvim.lsp.utils").format {timeout_ms = 5000} end,
+    "Format"
+}
 local formatters = require "lvim.lsp.null-ls.formatters"
-formatters.setup {
+local linters = require "lvim.lsp.null-ls.linters"
+formatters_config = {
     {
         command = "prettier",
         filetypes = {
@@ -61,9 +77,7 @@ formatters.setup {
     }, {command = "black", filetypes = {"python"}},
     {command = "lua-format", filetypes = {"lua"}}
 }
-
-local linters = require "lvim.lsp.null-ls.linters"
-linters.setup {
+linters_config = {
     {command = "flake8", filetypes = {"python"}}, {
         command = "eslint",
         filetypes = {
@@ -71,6 +85,10 @@ linters.setup {
         }
     }, {command = "luacheck", filetypes = {"lua"}}
 }
+-- Call the function to load config if available
+load_project_config()
+formatters.setup(formatters_config)
+linters.setup(linters_config)
 
 local code_actions = require "lvim.lsp.null-ls.code_actions"
 code_actions.setup {
@@ -298,7 +316,7 @@ local aerial_config = function()
         manage_folds = true,
         link_folds_to_tree = false,
         link_tree_to_folds = true,
-        open_automatic = true,
+        open_automatic = false,
         lsp = {
             diagnostics_trigger_update = true,
             update_when_errors = true,
@@ -340,10 +358,14 @@ lvim.plugins = {
     }, {
         'stevearc/aerial.nvim',
         opts = {},
-        -- Optional dependencies
         dependencies = {
             "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons"
         },
         config = aerial_config
     }
 }
+
+local pyright_opts = {
+    settings = {python = {analysis = {typeCheckingMode = "off"}}}
+}
+require("lvim.lsp.manager").setup("pyright", pyright_opts)
