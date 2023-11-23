@@ -65,6 +65,13 @@ lvim.builtin.which_key.mappings["l"]["f"] = {
     function() require("lvim.lsp.utils").format {timeout_ms = 5000} end,
     "Format"
 }
+-- add `pyright` to `skipped_servers` list
+vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "pyright" })
+-- remove `jedi_language_server` from `skipped_servers` list
+lvim.lsp.automatic_configuration.skipped_servers = vim.tbl_filter(function(server)
+  return server ~= "jedi_language_server"
+end, lvim.lsp.automatic_configuration.skipped_servers)
+
 local formatters = require "lvim.lsp.null-ls.formatters"
 local linters = require "lvim.lsp.null-ls.linters"
 formatters_config = {
@@ -365,7 +372,10 @@ lvim.plugins = {
     }
 }
 
-local pyright_opts = {
-    settings = {python = {analysis = {typeCheckingMode = "off"}}}
-}
-require("lvim.lsp.manager").setup("pyright", pyright_opts)
+-- local pyright_opts = {
+--     settings = {
+--         pyright = {reportUnusedVariable = "none", reportMissingImports = false},
+--         python = {analysis = {typeCheckingMode = "off"}}
+--     }
+-- }
+-- require("lvim.lsp.manager").setup("pyright", pyright_opts)
